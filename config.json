@@ -1,0 +1,8 @@
+{
+  "season": "auto",
+  "timezone": "Asia/Shanghai",
+  "duration_minutes": 120,
+  "team_name": "上海申花",
+  "official_source": "https://api-app-sh.shenhuafc.com.cn/api/v2.0/match/schedule/match_list?is_match_day=0",
+  "official_minimum_events": 10
+}

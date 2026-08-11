@@ -1,0 +1,34 @@
+name: Update calendar
+on:
+  schedule:
+    - cron: "17 18 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: update-shenhua-calendar
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch official fixtures and build calendar
+        run: python scripts/update_calendar.py
+      - name: Validate calendar
+        run: python scripts/update_calendar.py --offline --check
+      - name: Commit changes
+        run: |
+          if git diff --quiet -- shenhua.ics data/schedule.json; then
+            echo "No schedule changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add shenhua.ics data/schedule.json
+          git commit -m "chore: update Shenhua fixtures"
+          git push
