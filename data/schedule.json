@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-11T00:00:00+00:00",
+  "updated_at": "2026-08-14T08:36:16.103617+00:00",
   "events": [
     {
       "id": "sh-2026-acl-1",
@@ -31,8 +31,8 @@
       "home": "上海申花",
       "away": "大连英博",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-02",
@@ -42,8 +42,8 @@
       "home": "浙江俱乐部",
       "away": "上海申花",
       "venue": "黄龙体育中心体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-03",
@@ -53,8 +53,8 @@
       "home": "北京国安",
       "away": "上海申花",
       "venue": "北京工人体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-04",
@@ -64,8 +64,8 @@
       "home": "天津津门虎",
       "away": "上海申花",
       "venue": "天津泰达足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-05",
@@ -75,8 +75,8 @@
       "home": "上海申花",
       "away": "上海海港",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-06",
@@ -86,8 +86,8 @@
       "home": "上海申花",
       "away": "辽宁铁人",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-07",
@@ -97,8 +97,8 @@
       "home": "上海申花",
       "away": "青岛海牛",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-08",
@@ -108,8 +108,8 @@
       "home": "河南俱乐部",
       "away": "上海申花",
       "venue": "郑州航海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-09",
@@ -119,8 +119,8 @@
       "home": "上海申花",
       "away": "成都蓉城",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-10",
@@ -130,8 +130,8 @@
       "home": "山东泰山",
       "away": "上海申花",
       "venue": "济南奥体中心体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-11",
@@ -141,8 +141,8 @@
       "home": "上海申花",
       "away": "重庆铜梁龙",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-12",
@@ -152,8 +152,8 @@
       "home": "云南玉昆",
       "away": "上海申花",
       "venue": "玉溪高原体育运动中心体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-13",
@@ -163,8 +163,8 @@
       "home": "上海申花",
       "away": "武汉三镇",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-14",
@@ -174,8 +174,8 @@
       "home": "上海申花",
       "away": "深圳新鹏城",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-15",
@@ -185,8 +185,8 @@
       "home": "青岛西海岸",
       "away": "上海申花",
       "venue": "青岛西海岸大学城体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-cup-4",
@@ -196,8 +196,8 @@
       "home": "石家庄功夫",
       "away": "上海申花",
       "venue": "石家庄裕彤国际体育中心",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-16",
@@ -207,8 +207,8 @@
       "home": "大连英博",
       "away": "上海申花",
       "venue": "大连梭鱼湾足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-17",
@@ -218,19 +218,8 @@
       "home": "上海申花",
       "away": "浙江俱乐部",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
-    },
-    {
-      "id": "sh-2026-csl-18",
-      "competition": "中超",
-      "round": "第18轮",
-      "start": "2026-07-11T19:35:00+08:00",
-      "home": "上海申花",
-      "away": "北京国安",
-      "venue": "上海体育场",
-      "status": "postponed",
-      "source": "official-announcement"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-19",
@@ -240,8 +229,8 @@
       "home": "上海申花",
       "away": "天津津门虎",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-cup-5",
@@ -251,8 +240,8 @@
       "home": "上海申花",
       "away": "青岛海牛",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-20",
@@ -262,8 +251,8 @@
       "home": "上海海港",
       "away": "上海申花",
       "venue": "浦东足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-21",
@@ -273,8 +262,8 @@
       "home": "辽宁铁人",
       "away": "上海申花",
       "venue": "沈阳铁西体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-22",
@@ -284,8 +273,8 @@
       "home": "青岛海牛",
       "away": "上海申花",
       "venue": "青岛青春足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "已结束",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-23",
@@ -295,8 +284,19 @@
       "home": "上海申花",
       "away": "河南俱乐部",
       "venue": "上海体育场",
+      "status": "未开始",
+      "source": "上海申花官网"
+    },
+    {
+      "id": "sh-2026-csl-18",
+      "competition": "中超",
+      "round": "第18轮",
+      "start": "2026-08-18T19:35:00+08:00",
+      "home": "上海申花",
+      "away": "北京国安",
+      "venue": "上海体育场",
       "status": "scheduled",
-      "source": "baseline"
+      "source": "中足联官网"
     },
     {
       "id": "sh-2026-csl-24",
@@ -306,8 +306,8 @@
       "home": "成都蓉城",
       "away": "上海申花",
       "venue": "五粮液文化体育中心专业足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-25",
@@ -317,8 +317,19 @@
       "home": "上海申花",
       "away": "山东泰山",
       "venue": "上海体育场",
+      "status": "未开始",
+      "source": "上海申花官网"
+    },
+    {
+      "id": "sh-2026-cup-qf",
+      "competition": "足协杯",
+      "round": "1/4决赛",
+      "start": "2026-09-01T19:00:00+08:00",
+      "home": "大连英博",
+      "away": "上海申花",
+      "venue": "大连梭鱼湾足球场",
       "status": "scheduled",
-      "source": "baseline"
+      "source": "中国足协杯赛程"
     },
     {
       "id": "sh-2026-csl-26",
@@ -328,8 +339,8 @@
       "home": "重庆铜梁龙",
       "away": "上海申花",
       "venue": "重庆龙兴足球场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-27",
@@ -339,8 +350,8 @@
       "home": "上海申花",
       "away": "云南玉昆",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-28",
@@ -350,8 +361,8 @@
       "home": "武汉三镇",
       "away": "上海申花",
       "venue": "武汉体育中心体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-29",
@@ -361,8 +372,8 @@
       "home": "深圳新鹏城",
       "away": "上海申花",
       "venue": "深圳市体育中心体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     },
     {
       "id": "sh-2026-csl-30",
@@ -372,8 +383,8 @@
       "home": "上海申花",
       "away": "青岛西海岸",
       "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "baseline"
+      "status": "未开始",
+      "source": "上海申花官网"
     }
   ]
 }

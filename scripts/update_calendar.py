@@ -65,7 +65,12 @@ def value(raw: dict, *keys: str):
         if raw.get(key) not in (None, ""): return raw[key]
 
 def team(raw: dict, side: str) -> str:
-    result = value(raw, f"{side}_team_name", f"{side}_name", f"{side}TeamName", side)
+    keys = (f"{side}_team_name", f"{side}_name", f"{side}TeamName", side)
+    if side == "home":
+        keys += ("home_team",)
+    if side == "away":
+        keys += ("visiting_team", "visitor_team")
+    result = value(raw, *keys)
     if isinstance(result, dict): result = value(result, "name", "team_name", "display_name", "short_name")
     aliases={"Zhejiang Professional FC":"浙江俱乐部","Henan":"河南俱乐部","Shanghai Shenhua":"上海申花"}
     return aliases.get(str(result or ""), str(result or ""))
@@ -93,21 +98,31 @@ def parse_time(raw: Any, tz: ZoneInfo) -> datetime | None:
 def parse_official(raw: dict, config: dict) -> dict | None:
     home,away=team(raw,"home"),team(raw,"away")
     if config["team_name"] not in (home,away): return None
-    start=parse_time(value(raw,"match_time","start_time","start_at","match_date","date","time"),ZoneInfo(config["timezone"]))
+    info=raw.get("match_info") if isinstance(raw.get("match_info"),dict) else {}
+    stadium=raw.get("stadium_info") if isinstance(raw.get("stadium_info"),dict) else {}
+    start=parse_time(value(info,"start_time","start_at") or value(raw,"match_time","start_time","start_at","match_date","date","time"),ZoneInfo(config["timezone"]))
     if not start: return None
-    type_text=str(value(raw,"match_type_name","competition_name","league_name","type_name","match_type") or "")
-    round_text=str(value(raw,"round_name","round","match_round","turn","stage_name") or "")
+    type_text=str(value(info,"match_type_name","match_title") or value(raw,"match_type_name","competition_name","league_name","type_name","match_type") or "")
+    round_text=str(value(info,"match_rounds") or value(raw,"round_name","round","match_round","turn","stage_name") or "")
     joined=type_text+round_text
     competition="足协杯" if "足协杯" in joined else "亚冠" if "亚冠" in joined else "中超"
+    chinese_rounds={"第一轮":"第1轮","第二轮":"第2轮","第三轮":"第3轮","第四轮":"第4轮","第五轮":"第5轮","第六轮":"第6轮","第七轮":"第7轮","第八轮":"第8轮"}
+    round_text=chinese_rounds.get(round_text,round_text)
     number=re.search(r"(\d+)",round_text)
     if number: round_text=f"第{number.group(1)}轮"
-    venue=str(value(raw,"stadium_name","venue","match_address","address","stadium") or "待定")
-    status=str(value(raw,"status_name","match_status_name","status","match_status") or "scheduled")
+    venue=str(value(stadium,"stadium_name") or value(raw,"stadium_name","venue","match_address","address","stadium") or "待定")
+    status=str(value(raw,"match_status_text","status_name","match_status_name","status","match_status") or "scheduled")
     if any(x in status.lower() for x in ("延期","推迟","待定","postpon")): status="postponed"
     return {"id":str(value(raw,"match_id","schedule_id","id") or identity({"competition":competition,"home":home,"away":away})),"competition":competition,"round":round_text,"start":start.isoformat(),"home":home,"away":away,"venue":venue,"status":status,"source":"上海申花官网"}
 
 def fetch_official(config: dict) -> list[dict]:
-    request=urllib.request.Request(config["official_source"],headers={"User-Agent":"shenhua-calendar/2.0"})
+    request=urllib.request.Request(config["official_source"],headers={
+        "User-Agent":"shenhua-calendar/2.1",
+        "X-Requested-With":"XMLHttpRequest",
+        "bp-client-type":"21",
+        "bp-client-id":"OWPC",
+        "bp-client-version":"2.0.0"
+    })
     with urllib.request.urlopen(request,timeout=30) as response: payload=json.load(response)
     events={}
     for raw in walk(payload):
@@ -121,7 +136,14 @@ def merge(baseline: list[dict], official: list[dict], overrides: list[dict]) -> 
         old=events.get(identity(event))
         if old: event=dict(event,id=old["id"],round=event["round"] or old.get("round",""))
         events[identity(event)]=event
-    for event in overrides: events[identity(event)]=event
+    official_by_key={identity(e):e for e in official}
+    for event in overrides:
+        current=official_by_key.get(identity(event))
+        # A temporary postponement override expires automatically after the club
+        # publishes a genuinely different kick-off time.
+        if event.get("until_official_changes") and current and current["start"] != event["start"]:
+            continue
+        events[identity(event)]=event
     return sorted(events.values(),key=lambda e:e["start"])
 
 def escape(text: str) -> str:

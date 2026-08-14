@@ -10,9 +10,11 @@ class Tests(unittest.TestCase):
         self.config=json.loads((ROOT/"config.json").read_text())
         self.event={"id":"x","competition":"中超","round":"第1轮","start":"2026-03-07T17:00:00+08:00","home":"上海申花","away":"大连英博","venue":"上海体育场","status":"scheduled","source":"test"}
     def test_parse_official(self):
-        raw={"match_id":18,"match_time":"2026-08-18 19:35","home_team_name":"上海申花","away_team_name":"北京国安","match_type_name":"中超","round_name":"第18轮","stadium_name":"上海体育场"}
+        raw={"match_id":18,"match_status_text":"未开始","match_info":{"start_time":"2026-08-18 19:35","match_type_name":"中超","match_rounds":"第18轮"},"home_team":{"name":"上海申花"},"visiting_team":{"name":"北京国安"},"stadium_info":{"stadium_name":"上海体育场"}}
         event=updater.parse_official(raw,self.config)
         self.assertEqual(event["start"],"2026-08-18T19:35:00+08:00")
+        self.assertEqual(event["away"],"北京国安")
+        self.assertEqual(event["round"],"第18轮")
     def test_uid_stable_after_time_change(self):
         changed=dict(self.event,start="2026-03-08T19:35:00+08:00")
         self.assertEqual(updater.uid(self.event),updater.uid(changed))
@@ -22,5 +24,10 @@ class Tests(unittest.TestCase):
     def test_partial_update_keeps_other_events(self):
         other=dict(self.event,id="y",home="大连英博",away="上海申花")
         self.assertEqual(len(updater.merge([other],[self.event],[])),2)
+    def test_temporary_override_expires_after_official_reschedule(self):
+        delayed=dict(self.event,status="postponed",until_official_changes=True)
+        official=dict(self.event,start="2026-08-18T19:35:00+08:00",source="上海申花官网")
+        merged=updater.merge([self.event],[official],[delayed])
+        self.assertEqual(merged[0]["start"],official["start"])
 
 if __name__=="__main__": unittest.main()
