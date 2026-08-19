@@ -1,6 +1,5 @@
 {
   "events": [
-    {"id":"sh-2026-csl-18","competition":"中超","round":"第18轮","start":"2026-08-18T19:35:00+08:00","home":"上海申花","away":"北京国安","venue":"上海体育场","status":"scheduled","source":"中足联官网"},
     {"id":"sh-2026-cup-qf","competition":"足协杯","round":"1/4决赛","start":"2026-09-01T19:00:00+08:00","home":"大连英博","away":"上海申花","venue":"大连梭鱼湾足球场","status":"scheduled","source":"中国足协杯赛程"}
   ]
 }

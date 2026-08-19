@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Update Shanghai Shenhua's stable iCalendar feed from the club website."""
+"""Update Shanghai Shenhua's stable iCalendar feed from official sources."""
 from __future__ import annotations
 
-import argparse, hashlib, json, re, sys, urllib.request
+import argparse, gzip, hashlib, html, json, re, sys, urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, urlencode, urljoin, urlsplit, urlunsplit
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,8 +60,23 @@ def read_json(path: Path, default: Any) -> Any:
 def year_for(config: dict) -> int:
     return datetime.now(ZoneInfo(config["timezone"])).year if config["season"] == "auto" else int(config["season"])
 
+def fetch_bytes(url: str, headers: dict | None = None, timeout: int = 30) -> bytes:
+    parts=urlsplit(url)
+    safe_url=urlunsplit((parts.scheme,parts.netloc,quote(parts.path,safe="/%:"),quote(parts.query,safe="=&"),parts.fragment))
+    request=urllib.request.Request(safe_url,headers={"User-Agent":"shenhua-calendar/3.0","Accept-Encoding":"gzip",**(headers or {})})
+    with urllib.request.urlopen(request,timeout=timeout) as response:
+        data=response.read()
+        return gzip.decompress(data) if response.headers.get("Content-Encoding")=="gzip" else data
+
+def fetch_json(url: str, headers: dict | None = None) -> Any:
+    return json.loads(fetch_bytes(url,headers).decode("utf-8"))
+
+def base_identity(event: dict) -> str:
+    competition="亚冠" if event["competition"].startswith("亚冠") else event["competition"]
+    return "|".join((competition, event["home"], event["away"]))
+
 def identity(event: dict) -> str:
-    return "|".join((event["competition"], event["home"], event["away"]))
+    return "|".join((base_identity(event),str(event.get("round") or "")))
 
 def value(raw: dict, *keys: str):
     for key in keys:
@@ -116,25 +134,152 @@ def parse_official(raw: dict, config: dict) -> dict | None:
     return {"id":str(value(raw,"match_id","schedule_id","id") or identity({"competition":competition,"home":home,"away":away})),"competition":competition,"round":round_text,"start":start.isoformat(),"home":home,"away":away,"venue":venue,"status":status,"source":"上海申花官网"}
 
 def fetch_official(config: dict) -> list[dict]:
-    request=urllib.request.Request(config["official_source"],headers={
-        "User-Agent":"shenhua-calendar/2.1",
+    payload=fetch_json(config["official_source"],{
         "X-Requested-With":"XMLHttpRequest",
         "bp-client-type":"21",
         "bp-client-id":"OWPC",
         "bp-client-version":"2.0.0"
     })
-    with urllib.request.urlopen(request,timeout=30) as response: payload=json.load(response)
     events={}
     for raw in walk(payload):
         event=parse_official(raw,config)
         if event and datetime.fromisoformat(event["start"]).year==year_for(config): events[identity(event)]=event
     return sorted(events.values(),key=lambda e:e["start"])
 
+def clean_team_name(name: str) -> str:
+    aliases={
+        "Shanghai Shenhua FC":"上海申花","Shanghai Shenhua":"上海申花",
+        "FC Machida Zelvia":"町田泽维亚","Tampines Rovers FC":"淡滨尼流浪者",
+        "Preah Khan Reach Svay Rieng FC":"柏威夏瑞恩格",
+        "大连英博海发":"大连英博","辽宁铁人楠波湾":"辽宁铁人",
+        "河南俱乐部彩陶坊":"河南俱乐部","浙江俱乐部绿城":"浙江俱乐部",
+    }
+    name=re.sub(r"\s*\([A-Z]{3}\)\s*$","",name).strip()
+    name=re.sub(r"足球俱乐部$","",name)
+    return aliases.get(name,name)
+
+def fetch_cfl(config: dict) -> list[dict]:
+    base=config["cfl_api"].rstrip("/")
+    seasons=fetch_json(f"{base}/tournaments?competition_code=CSL")["data"]["dataList"]
+    season=next((item for item in seasons if str(item.get("name"))==str(year_for(config))),None)
+    if not season: return []
+    query=urlencode({"tournament_calendar_id":season["id"],"competition_code":"CSL","contestant_id":"","week":"","stage_id":"","curPage":1,"pageSize":999})
+    rows=fetch_json(f"{base}/matches/page?{query}")["data"]["dataList"]
+    result=[]; tz=ZoneInfo(config["timezone"])
+    for row in rows:
+        home=clean_team_name(str(row.get("home_contestant_name") or "")); away=clean_team_name(str(row.get("away_contestant_name") or ""))
+        if config["team_name"] not in (home,away): continue
+        start=parse_time(row.get("local_date_time"),tz)
+        if not start: continue
+        status=str(row.get("match_status") or "scheduled")
+        result.append({"id":str(row.get("id") or identity({"competition":"中超","home":home,"away":away})),"competition":"中超","round":f"第{row.get('week')}轮" if row.get("week") else "","start":start.isoformat(),"home":home,"away":away,"venue":str(row.get("venue_long_name") or row.get("venue_short_name") or "待定"),"status":status,"source":"中足联官网"})
+    return sorted(result,key=lambda e:e["start"])
+
+COUNTRY_TZ={"CHN":"Asia/Shanghai","JPN":"Asia/Tokyo","KOR":"Asia/Seoul","THA":"Asia/Bangkok","CAM":"Asia/Phnom_Penh","SGP":"Asia/Singapore","MAS":"Asia/Kuala_Lumpur","HKG":"Asia/Hong_Kong","VIE":"Asia/Ho_Chi_Minh","AUS":"Australia/Sydney"}
+MONTH_NAMES=("","January","February","March","April","May","June","July","August","September","October","November","December")
+MONTHS={name:i for i,name in enumerate(MONTH_NAMES)}
+MONTHS.update({name[:3]:i for i,name in enumerate(MONTH_NAMES) if name})
+
+def afc_dates(text: str, year: int) -> dict[int, datetime]:
+    dates={}
+    month_pattern="|".join(sorted(MONTHS,key=len,reverse=True))
+    for md,day,month,found_year in re.findall(rf"MD(\d).*?(\d{{1,2}})\s+({month_pattern})\s+(\d{{4}})",text,re.S):
+        dates[int(md)]=datetime(int(found_year),MONTHS[month],int(day))
+    return dates
+
+def parse_afc_pdf(data: bytes, competition: str, config: dict, source_url: str) -> list[dict]:
+    try:
+        from pypdf import PdfReader
+    except ImportError as exc:
+        raise RuntimeError("AFC PDF reader is not installed; run pip install -r requirements.txt") from exc
+    target="Shanghai Shenhua FC"; result=[]; output_tz=ZoneInfo(config["timezone"])
+    for page in PdfReader(BytesIO(data)).pages:
+        raw=page.extract_text() or ""
+        if target not in raw or "Day / Date" not in raw: continue
+        flat=re.sub(r"\s+"," ",raw)
+        match_part=flat.split("as of",1)[0]
+        matches=re.findall(r"([A-H][1-4])\s+(.+?)\s+vs\s+(.+?)\s+([A-H][1-4])\s+(\d{1,2}:\d{2})",match_part)
+        dates=afc_dates(flat,year_for(config))
+        for index,(home_code,home,away,away_code,kickoff) in enumerate(matches):
+            if target not in home and target not in away: continue
+            md=index//2+1; date=dates.get(md)
+            if not date: continue
+            country=re.search(r"\(([A-Z]{3})\)\s*$",home)
+            local_tz=ZoneInfo(COUNTRY_TZ.get(country.group(1) if country else "CHN",config["timezone"]))
+            hour,minute=map(int,kickoff.split(":")); start=date.replace(hour=hour,minute=minute,tzinfo=local_tz).astimezone(output_tz)
+            home_name=clean_team_name(home); away_name=clean_team_name(away)
+            venue="上海体育场" if home_name==config["team_name"] else "待定"
+            result.append({"id":f"afc-{competition}-{home_code}-{away_code}-{date:%Y%m%d}","competition":competition,"round":f"第{md}轮","start":start.isoformat(),"home":home_name,"away":away_name,"venue":venue,"status":"scheduled","source":"AFC官网","source_url":source_url})
+    return result
+
+def fetch_afc(config: dict) -> list[dict]:
+    result=[]
+    for source in config.get("afc_schedule_pages",[]):
+        landing=fetch_bytes(source["url"]).decode("utf-8","replace")
+        links=re.findall(r"https://www\.the-afc\.com/en/more/content/[^\"< ]*match-schedule",landing)
+        pages=[source["url"],*links[:4]]
+        pdf_urls=[]
+        for page_url in pages:
+            page=fetch_bytes(page_url).decode("utf-8","replace") if page_url!=source["url"] else landing
+            for link in re.findall(r"https://assets\.the-afc\.com[^\"<]+?\.pdf",page):
+                link=html.unescape(link).replace("\\u2013","–")
+                if link not in pdf_urls: pdf_urls.append(link)
+        for pdf_url in pdf_urls:
+            result.extend(parse_afc_pdf(fetch_bytes(pdf_url),source["competition"],config,pdf_url))
+    return sorted({identity(e):e for e in result}.values(),key=lambda e:e["start"])
+
+def html_text(raw: str) -> str:
+    raw=re.sub(r"<(script|style)[^>]*>.*?</\1>"," ",raw,flags=re.I|re.S)
+    return re.sub(r"\s+"," ",html.unescape(re.sub(r"<[^>]+>"," ",raw))).strip()
+
+def fetch_cfa_announcements(config: dict) -> list[dict]:
+    """Read structured Shenhua fixture statements from recent CFA announcements.
+
+    The CFA currently exposes articles rather than a public fixture JSON API. Only
+    explicit date + kick-off + opponent statements are accepted; ambiguous draw
+    previews are ignored and the club feed remains the exact-time fallback.
+    """
+    base=config["cfa_base"].rstrip("/"); article_urls=[]
+    for channel in config.get("cfa_channels",[]):
+        for page_no in (1,2):
+            suffix="index.html" if page_no==1 else f"index_{page_no}.html"
+            page_url=f"{base}/{channel}/{suffix}"
+            try: listing=fetch_bytes(page_url,timeout=10).decode("utf-8","replace")
+            except Exception: continue
+            for href,title in re.findall(r"<a[^>]+href=[\"']([^\"']+\.html)[\"'][^>]*>(.*?)</a>",listing,re.I|re.S):
+                title_text=html_text(title)
+                if any(keyword in title_text for keyword in ("足协杯","足球","赛程","抽签","赛事")):
+                    article_urls.append(urljoin(base,href))
+    events=[]; year=year_for(config); tz=ZoneInfo(config["timezone"])
+    team_pattern=r"[\u4e00-\u9fffA-Za-z·]+(?:俱乐部(?:彩陶坊)?|队|FC)?"
+    articles={}
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        pending={pool.submit(fetch_bytes,url,None,10):url for url in dict.fromkeys(article_urls)}
+        for future in as_completed(pending):
+            try: articles[pending[future]]=future.result().decode("utf-8","replace")
+            except Exception: pass
+    for article_url,raw_article in articles.items():
+        text=html_text(raw_article)
+        if "足协杯" not in text or config["team_name"] not in text: continue
+        for match in re.finditer(rf"({team_pattern})\s*(?:VS|vs|对阵|迎战)\s*({team_pattern})",text):
+            home=clean_team_name(match.group(1)); away=clean_team_name(match.group(2))
+            if config["team_name"] not in (home,away): continue
+            window=text[max(0,match.start()-180):match.end()+180]
+            date_match=re.search(r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日",window)
+            time_match=re.search(r"(?:开球时间|比赛时间|北京时间)?[^0-9]{0,8}(\d{1,2})[:：](\d{2})",window)
+            if not date_match or not time_match: continue
+            start=datetime(int(date_match.group(1) or year),int(date_match.group(2)),int(date_match.group(3)),int(time_match.group(1)),int(time_match.group(2)),tzinfo=tz)
+            round_match=re.search(r"(第[一二三四五六七八九十\d]+轮|1/8决赛|1/4决赛|半决赛|决赛)",window)
+            events.append({"id":hashlib.sha256((article_url+identity({"competition":"足协杯","home":home,"away":away})).encode()).hexdigest()[:20],"competition":"足协杯","round":round_match.group(1) if round_match else "","start":start.isoformat(),"home":home,"away":away,"venue":"待定","status":"scheduled","source":"中国足协官网","source_url":article_url})
+    return sorted({identity(e):e for e in events}.values(),key=lambda e:e["start"])
+
 def merge(baseline: list[dict], official: list[dict], overrides: list[dict]) -> list[dict]:
     events={identity(e):e for e in baseline}
     for event in official:
         old=events.get(identity(event))
-        if old: event=dict(event,id=old["id"],round=event["round"] or old.get("round",""))
+        if old:
+            event=dict(event,id=old["id"],round=event["round"] or old.get("round",""))
+            if event.get("venue") in (None,"","待定") and old.get("venue"): event["venue"]=old["venue"]
         events[identity(event)]=event
     official_by_key={identity(e):e for e in official}
     for event in overrides:
@@ -158,7 +303,9 @@ def fold(line: str) -> list[str]:
     return [parts[0],*[" "+x for x in parts[1:]]]
 
 def uid(event: dict) -> str:
-    return LEGACY_UIDS.get(identity(event),hashlib.sha256(identity(event).encode()).hexdigest()[:20]+"@shenhua-calendar")
+    legacy=LEGACY_UIDS.get(base_identity(event))
+    if legacy and not str(event.get("id","")).startswith("afc-"): return legacy
+    return hashlib.sha256(identity(event).encode()).hexdigest()[:20]+"@shenhua-calendar"
 
 def make_ics(events: list[dict], config: dict, updated_at: str) -> str:
     stamp=datetime.fromisoformat(updated_at).astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -184,12 +331,19 @@ def validate(events: list[dict], config: dict):
 def main() -> int:
     parser=argparse.ArgumentParser(); parser.add_argument("--offline",action="store_true"); parser.add_argument("--check",action="store_true"); args=parser.parse_args()
     config=read_json(CONFIG,{}); schedule=read_json(SCHEDULE,{"events":[]}); baseline=schedule["events"]; overrides=read_json(OVERRIDES,{"events":[]})["events"]
-    official=[]
+    official=[]; source_counts={}
     if not args.offline:
-        try:
-            official=fetch_official(config)
-            if len(official)<config["official_minimum_events"]: print(f"官网仅返回{len(official)}场，保留旧数据",file=sys.stderr); official=[]
-        except Exception as exc: print(f"官网不可用，保留旧数据：{exc}",file=sys.stderr)
+        fetchers=(("申花官网",fetch_official),("中国足协",fetch_cfa_announcements),("AFC",fetch_afc),("中足联",fetch_cfl))
+        for source_name,fetcher in fetchers:
+            try:
+                found=fetcher(config)
+                if source_name=="申花官网" and len(found)<config["official_minimum_events"]:
+                    print(f"{source_name}仅返回{len(found)}场，忽略本次结果",file=sys.stderr); found=[]
+                if source_name=="中足联" and found and len(found)<20:
+                    print(f"{source_name}仅返回{len(found)}场中超，忽略本次结果",file=sys.stderr); found=[]
+                source_counts[source_name]=len(found); official.extend(found)
+            except Exception as exc:
+                source_counts[source_name]=0; print(f"{source_name}不可用，保留其他来源和旧数据：{exc}",file=sys.stderr)
     events=merge(baseline,official,overrides)
     current=[e for e in events if datetime.fromisoformat(e["start"]).year==year_for(config)]
     if current: events=current
@@ -199,6 +353,6 @@ def main() -> int:
     calendar=make_ics(events,config,updated)
     if args.check: print(f"验证通过：{len(events)}场"); return 0
     SCHEDULE.write_text(json.dumps({"updated_at":updated,"events":events},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    CALENDAR.write_bytes(calendar.encode()); print(f"已生成{len(events)}场，官网更新{len(official)}场"); return 0
+    CALENDAR.write_bytes(calendar.encode()); details="，".join(f"{name}{count}场" for name,count in source_counts.items()); print(f"已生成{len(events)}场"+(f"（{details}）" if details else "")); return 0
 
 if __name__ == "__main__": raise SystemExit(main())

@@ -4,5 +4,18 @@
   "duration_minutes": 120,
   "team_name": "上海申花",
   "official_source": "https://api-app-sh.shenhuafc.com.cn/api/v2.0/match/schedule/match_list?is_match_day=0",
-  "official_minimum_events": 10
+  "official_minimum_events": 10,
+  "cfl_api": "https://api.cfl-china.cn/frontweb/api",
+  "cfa_base": "https://www.thecfa.cn",
+  "cfa_channels": ["xinwenzixun", "mtzl", "qttz", "lstz"],
+  "afc_schedule_pages": [
+    {
+      "competition": "亚冠精英",
+      "url": "https://www.the-afc.com/en/club/afc_champions_league_elite.html"
+    },
+    {
+      "competition": "亚冠二级",
+      "url": "https://www.the-afc.com/en/club/afc_champions_league_two.html"
+    }
+  ]
 }
