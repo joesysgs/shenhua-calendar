@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-29T13:44:32.846355+00:00",
+  "updated_at": "2026-09-01T21:02:27.155659+00:00",
   "events": [
     {
       "id": "sh-2026-acl-1",
@@ -352,7 +352,7 @@
       "venue": "上海体育场",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     },
     {
       "id": "sh-2026-csl-27",
@@ -375,7 +375,7 @@
       "venue": "待定",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     },
     {
       "id": "sh-2026-csl-28",
@@ -409,7 +409,7 @@
       "venue": "上海体育场",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     },
     {
       "id": "afc-亚冠二级-G1-G2-20261105",
@@ -421,7 +421,7 @@
       "venue": "待定",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     },
     {
       "id": "sh-2026-csl-30",
@@ -444,7 +444,7 @@
       "venue": "待定",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     },
     {
       "id": "afc-亚冠二级-G2-G3-20261203",
@@ -456,7 +456,7 @@
       "venue": "上海体育场",
       "status": "scheduled",
       "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/ACL-Two-26-27-GS-–-Draw-Results-&-Match-Schedule.pdf"
+      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule.pdf"
     }
   ]
 }
