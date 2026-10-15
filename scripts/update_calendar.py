@@ -290,8 +290,23 @@ def merge(baseline: list[dict], official: list[dict], overrides: list[dict]) -> 
             and event.get("competition","").startswith("亚冠")
             and (datetime.fromisoformat(event["start"]).year,event.get("round","")) in club_afc_slots
         )
-    baseline=[e for e in baseline if not superseded_afc_pdf(e)]
-    official=[e for e in official if not superseded_afc_pdf(e)]
+    # Cup round labels are not consistent between sources (for example,
+    # "第6轮" and "1/4决赛"). Match by season + teams instead, and prefer the
+    # club's confirmed kick-off time over an older announcement or override.
+    club_cup_fixtures={
+        (datetime.fromisoformat(e["start"]).year,base_identity(e))
+        for e in official
+        if e.get("source")=="上海申花官网" and e.get("competition")=="足协杯"
+    }
+    def superseded_cup(event: dict) -> bool:
+        return (
+            event.get("competition")=="足协杯"
+            and event.get("source")!="上海申花官网"
+            and (datetime.fromisoformat(event["start"]).year,base_identity(event)) in club_cup_fixtures
+        )
+    baseline=[e for e in baseline if not superseded_afc_pdf(e) and not superseded_cup(e)]
+    official=[e for e in official if not superseded_afc_pdf(e) and not superseded_cup(e)]
+    overrides=[e for e in overrides if not superseded_cup(e)]
     events={identity(e):e for e in baseline}
     for event in official:
         old=events.get(identity(event))

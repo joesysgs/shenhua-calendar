@@ -67,4 +67,10 @@ class Tests(unittest.TestCase):
         merged=updater.merge([], [afc], [])
         self.assertEqual(merged,[afc])
 
+    def test_club_cup_fixture_replaces_old_round_label_and_time(self):
+        old=dict(self.event,competition="足协杯",round="1/4决赛",start="2026-09-01T19:00:00+08:00",home="大连英博",away="上海申花",source="中国足协杯赛程")
+        confirmed=dict(old,id="159",round="第6轮",start="2026-09-01T19:35:00+08:00",status="已结束",source="上海申花官网")
+        merged=updater.merge([old],[confirmed],[old])
+        self.assertEqual(merged,[confirmed])
+
 if __name__=="__main__": unittest.main()
