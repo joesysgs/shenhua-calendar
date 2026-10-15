@@ -55,4 +55,16 @@ class Tests(unittest.TestCase):
         old=dict(self.event,competition="亚冠",venue="上海体育场")
         self.assertEqual(updater.merge([old],[afc],[])[0]["venue"],"上海体育场")
 
+    def test_club_afc_round_removes_superseded_pdf_fixture(self):
+        stale=dict(self.event,competition="亚冠二级",round="第2轮",home="上海申花",away="町田泽维亚",source="AFC官网")
+        confirmed=dict(self.event,competition="亚冠",round="第2轮",home="柴桢",away="上海申花",source="上海申花官网")
+        merged=updater.merge([stale],[stale,confirmed],[])
+        self.assertEqual(len(merged),1)
+        self.assertEqual((merged[0]["home"],merged[0]["away"]),("柴桢","上海申花"))
+
+    def test_afc_pdf_is_kept_when_club_has_not_published_that_round(self):
+        afc=dict(self.event,competition="亚冠二级",round="第2轮",home="上海申花",away="町田泽维亚",source="AFC官网")
+        merged=updater.merge([], [afc], [])
+        self.assertEqual(merged,[afc])
+
 if __name__=="__main__": unittest.main()

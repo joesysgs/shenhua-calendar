@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T21:40:46.202513+00:00",
+  "updated_at": "2026-10-15T04:19:49.454348+00:00",
   "events": [
     {
       "id": "sh-2026-acl-1",
@@ -376,18 +376,6 @@
       "source": "中足联官网"
     },
     {
-      "id": "afc-亚冠二级-G3-G2-20261015",
-      "competition": "亚冠二级",
-      "round": "第2轮",
-      "start": "2026-10-15T20:15:00+08:00",
-      "home": "柏威夏瑞恩格",
-      "away": "上海申花",
-      "venue": "待定",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-202627-Group-Stage-Match-Schedule---8sepupd.pdf"
-    },
-    {
       "id": "161",
       "competition": "亚冠",
       "round": "第2轮",
@@ -397,18 +385,6 @@
       "venue": "柬埔寨国家体育场",
       "status": "未开始",
       "source": "上海申花官网"
-    },
-    {
-      "id": "afc-亚冠二级-G2-G1-20261015",
-      "competition": "亚冠二级",
-      "round": "第2轮",
-      "start": "2026-10-15T20:15:00+08:00",
-      "home": "上海申花",
-      "away": "町田泽维亚",
-      "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule-25Sep-upd.pdf"
     },
     {
       "id": "sh-2026-csl-28",
@@ -433,18 +409,6 @@
       "source": "中足联官网"
     },
     {
-      "id": "afc-亚冠二级-G1-G2-20261029",
-      "competition": "亚冠二级",
-      "round": "第3轮",
-      "start": "2026-10-29T18:00:00+08:00",
-      "home": "町田泽维亚",
-      "away": "上海申花",
-      "venue": "待定",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule-25Sep-upd.pdf"
-    },
-    {
       "id": "afc-亚冠二级-G2-G1-20261029",
       "competition": "亚冠",
       "round": "第3轮",
@@ -467,18 +431,6 @@
       "source": "上海申花官网"
     },
     {
-      "id": "afc-亚冠二级-G4-G2-20261105",
-      "competition": "亚冠二级",
-      "round": "第4轮",
-      "start": "2026-11-05T18:00:00+08:00",
-      "home": "淡滨尼流浪者",
-      "away": "上海申花",
-      "venue": "待定",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule-25Sep-upd.pdf"
-    },
-    {
       "id": "sh-2026-csl-30",
       "competition": "中超",
       "round": "第30轮",
@@ -499,30 +451,6 @@
       "venue": "惹兰勿刹体育场",
       "status": "未开始",
       "source": "上海申花官网"
-    },
-    {
-      "id": "afc-亚冠二级-G2-G3-20261126",
-      "competition": "亚冠二级",
-      "round": "第5轮",
-      "start": "2026-11-26T18:00:00+08:00",
-      "home": "上海申花",
-      "away": "柏威夏瑞恩格",
-      "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-2026-27-Group-Stage-Match-Schedule-25Sep-upd.pdf"
-    },
-    {
-      "id": "afc-亚冠二级-G2-G3-20261203",
-      "competition": "亚冠二级",
-      "round": "第6轮",
-      "start": "2026-12-03T18:00:00+08:00",
-      "home": "上海申花",
-      "away": "柏威夏瑞恩格",
-      "venue": "上海体育场",
-      "status": "scheduled",
-      "source": "AFC官网",
-      "source_url": "https://assets.the-afc.com/2026-27_ACL_Two/Downloads/AFC-Champions-League-Two-202627-Group-Stage-Match-Schedule---8sepupd.pdf"
     },
     {
       "id": "163",

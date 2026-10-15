@@ -274,6 +274,24 @@ def fetch_cfa_announcements(config: dict) -> list[dict]:
     return sorted({identity(e):e for e in events}.values(),key=lambda e:e["start"])
 
 def merge(baseline: list[dict], official: list[dict], overrides: list[dict]) -> list[dict]:
+    # The AFC schedule page can retain links to superseded PDF revisions.  When
+    # Shenhua has published a fixture for the same season and matchday, treat
+    # the club entry as the authoritative current revision and discard every
+    # conflicting AFC-PDF entry.  This also removes stale conflicts already
+    # written to schedule.json by an earlier run.
+    club_afc_slots={
+        (datetime.fromisoformat(e["start"]).year,e.get("round",""))
+        for e in official
+        if e.get("source")=="上海申花官网" and e.get("competition","").startswith("亚冠") and e.get("round")
+    }
+    def superseded_afc_pdf(event: dict) -> bool:
+        return (
+            event.get("source")=="AFC官网"
+            and event.get("competition","").startswith("亚冠")
+            and (datetime.fromisoformat(event["start"]).year,event.get("round","")) in club_afc_slots
+        )
+    baseline=[e for e in baseline if not superseded_afc_pdf(e)]
+    official=[e for e in official if not superseded_afc_pdf(e)]
     events={identity(e):e for e in baseline}
     for event in official:
         old=events.get(identity(event))
